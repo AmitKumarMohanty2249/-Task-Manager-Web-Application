@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Smart Task Manager</title>
+    <meta
+      name="description"
+      content="Smart Task Manager – add, edit, filter, and persist tasks with LocalStorage. Includes login & register, dark mode, and async simulation."
+    />
+
+    <!-- Icons -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+    />
+
+    <!-- App Styles -->
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body data-theme="dark">
+    <div class="container">
+      <header>
+        <div class="brand">
+          <div class="logo"><i class="bi bi-check2-circle"></i></div>
+          <div>Smart Task Manager</div>
+        </div>
+        <div class="actions" id="headerActions">
+          <button id="themeToggle" class="btn ghost" title="Toggle theme">
+            <i class="bi bi-brightness-high"></i>
+          </button>
+          <button id="gotoLogin" class="btn ghost hidden">Login</button>
+          <button id="gotoRegister" class="btn ghost hidden">Register</button>
+          <div id="profileBox" class="profile hidden" title="Account">
+            <div class="avatar"><i class="bi bi-person"></i></div>
+            <div class="info">
+              <div id="profileName" class="profile-name">—</div>
+              <small id="profileLastLogin" class="muted">Last login: —</small>
+            </div>
+          </div>
+
+          <button id="logoutBtn" class="btn danger hidden">
+            <i class="bi bi-box-arrow-right"></i> Logout
+          </button>
+        </div>
+      </header>
+
+      <main class="center">
+        <!-- LOGIN VIEW -->
+        <section
+          id="view-login"
+          class="auth card hidden"
+          aria-label="Login form"
+        >
+          <div class="head"><h2>Login</h2></div>
+          <div class="body">
+            <form id="loginForm">
+              <div class="field">
+                <label for="loginEmail">Email</label>
+                <div class="input">
+                  <i class="bi bi-envelope"></i
+                  ><input
+                    id="loginEmail"
+                    type="email"
+                    required
+                    placeholder="you@example.com"
+                  />
+                </div>
+              </div>
+              <div class="field">
+                <label for="loginPass">Password</label>
+                <div class="input">
+                  <i class="bi bi-lock"></i
+                  ><input
+                    id="loginPass"
+                    type="password"
+                    required
+                    minlength="6"
+                    placeholder="••••••"
+                  />
+                </div>
+              </div>
+              <div id="loginError" class="alert error hidden"></div>
+              <button class="btn primary" type="submit">Sign in</button>
+              <p class="muted" style="margin-top: 12px">
+                New here? <a class="link" href="#register">Create account</a> ·
+                <a class="link" href="#forgot">Forgot password</a>
+              </p>
+            </form>
+          </div>
+        </section>
+
+        <!-- REGISTER VIEW -->
+        <section
+          id="view-register"
+          class="auth card hidden"
+          aria-label="Register form"
+        >
+          <div class="head"><h2>Create account</h2></div>
+          <div class="body">
+            <form id="registerForm">
+              <div class="field">
+                <label for="regName">Full name</label>
+                <div class="input">
+                  <i class="bi bi-person"></i
+                  ><input
+                    id="regName"
+                    type="text"
+                    required
+                    minlength="3"
+                    placeholder="Amit Kumar"
+                  />
+                </div>
+              </div>
+              <div class="field">
+                <label for="regEmail">Email</label>
+                <div class="input">
+                  <i class="bi bi-envelope"></i
+                  ><input
+                    id="regEmail"
+                    type="email"
+                    required
+                    placeholder="you@example.com"
+                  />
+                </div>
+              </div>
+              <div class="field">
+                <label for="regPass">Password</label>
+                <div class="input">
+                  <i class="bi bi-lock"></i
+                  ><input
+                    id="regPass"
+                    type="password"
+                    required
+                    minlength="6"
+                    placeholder="Minimum 6 characters"
+                  />
+                </div>
+                <div id="strength" class="strength muted">&nbsp;</div>
+              </div>
+              <div class="field">
+                <label for="regPass2">Confirm password</label>
+                <div class="input">
+                  <i class="bi bi-lock-fill"></i
+                  ><input
+                    id="regPass2"
+                    type="password"
+                    required
+                    minlength="6"
+                    placeholder="Repeat password"
+                  />
+                </div>
+              </div>
+              <div id="registerError" class="alert error hidden"></div>
+              <button class="btn success" type="submit">Create account</button>
+              <p class="muted" style="margin-top: 12px">
+                Already registered? <a class="link" href="#login">Sign in</a>
+              </p>
+            </form>
+          </div>
+        </section>
+
+        <!-- FORGOT VIEW -->
+        <section
+          id="view-forgot"
+          class="auth card hidden"
+          aria-label="Forgot password"
+        >
+          <div class="head"><h2>Reset password</h2></div>
+          <div class="body">
+            <form id="forgotForm">
+              <div class="field">
+                <label for="fpEmail">Your email</label>
+                <div class="input">
+                  <i class="bi bi-envelope-open"></i
+                  ><input
+                    id="fpEmail"
+                    type="email"
+                    required
+                    placeholder="you@example.com"
+                  />
+                </div>
+              </div>
+              <div id="forgotMsg" class="alert hidden"></div>
+              <button class="btn primary" type="submit">Send reset link</button>
+              <p class="muted" style="margin-top: 12px">
+                <a class="link" href="#login">Back to login</a>
+              </p>
+            </form>
+          </div>
+        </section>
+
+        <!-- APP VIEW -->
+        <section id="view-app" class="hidden" aria-label="Task application">
+          <div class="grid">
+            <!-- Sidebar: create & filters -->
+            <aside class="card" style="padding: 16px">
+              <h3 style="margin: 0 0 8px">Create task</h3>
+              <form id="taskForm" style="margin-top: 8px">
+                <div class="field">
+                  <label for="taskTitle">Title</label>
+                  <div class="input">
+                    <i class="bi bi-list-task"></i
+                    ><input
+                      id="taskTitle"
+                      type="text"
+                      required
+                      minlength="2"
+                      maxlength="120"
+                      placeholder="What do you need to do?"
+                    />
+                  </div>
+                </div>
+                <div class="field">
+                  <label for="taskNotes">Notes (optional)</label>
+                  <div class="input">
+                    <i class="bi bi-card-text"></i
+                    ><input
+                      id="taskNotes"
+                      type="text"
+                      maxlength="240"
+                      placeholder="Short description"
+                    />
+                  </div>
+                </div>
+                <div class="field">
+                  <label for="taskDue">Due date (optional)</label>
+                  <div class="input">
+                    <i class="bi bi-calendar-event"></i
+                    ><input id="taskDue" type="date" />
+                  </div>
+                </div>
+                <button class="btn primary" type="submit">
+                  <i class="bi bi-plus-lg"></i> Add Task
+                </button>
+              </form>
+
+              <hr class="divider" />
+
+              <div class="toolbar">
+                <div class="input" title="Filter">
+                  <i class="bi bi-funnel"></i>
+                  <select id="filterSelect">
+                    <option value="all">All</option>
+                    <option value="pending">Pending</option>
+                    <option value="completed">Completed</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="importexport">
+                <button class="btn danger" id="clearCompleted">
+                  <i class="bi bi-trash"></i> Clear completed
+                </button>
+                <button class="btn ghost" id="exportBtn">
+                  <i class="bi bi-download"></i> Export JSON
+                </button>
+                <button class="btn ghost" id="importBtn">
+                  <i class="bi bi-upload"></i> Import
+                </button>
+                <input
+                  type="file"
+                  id="importFile"
+                  accept="application/json"
+                  class="hidden"
+                />
+              </div>
+            </aside>
+
+            <!-- Main: stats + list -->
+            <section>
+              <div class="stats">
+                <div class="card progress-wrapper">
+                  <h3 style="margin: 0 0 8px">Overall Progress</h3>
+
+                  <div class="progress-bar">
+                    <div id="progressFill"></div>
+                  </div>
+
+                  <div id="progressText" class="progress-text">
+                    0% completed
+                  </div>
+                </div>
+
+                <div class="card stat">
+                  <h3 id="statTotal">0</h3>
+                  <p>Total</p>
+                </div>
+                <div class="card stat">
+                  <h3 id="statPending">0</h3>
+                  <p>Pending</p>
+                </div>
+                <div class="card stat">
+                  <h3 id="statCompleted">0</h3>
+                  <p>Completed</p>
+                </div>
+              </div>
+
+              <div class="card tasks-wrapper">
+                <div class="tasks-header">
+                  <h3>Your Tasks</h3>
+                  <small id="welcomeName" class="muted"></small>
+                </div>
+
+                <div id="taskList" class="task-list"></div>
+              </div>
+            </section>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <!-- App Script -->
+    <script type="module" src="./app.js"></script>
+    <!-- DELETE CONFIRMATION POPUP -->
+    <div id="deleteModal" class="modal hidden">
+      <div class="modal-content card">
+        <h3>Delete Task?</h3>
+        <p class="muted">
+          Are you sure you want to delete this task? This action cannot be
+          undone.
+        </p>
+
+        <div class="modal-actions">
+          <button id="confirmDelete" class="btn danger">Yes, delete</button>
+          <button id="cancelDelete" class="btn ghost">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
